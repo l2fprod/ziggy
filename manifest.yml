@@ -1,12 +1,9 @@
 applications:
 - path: .
-  memory: 1024M
+  memory: 64M
   instances: 1
   domain: mybluemix.net
   name: ziggy
-  host: ziggy
+  host: fredl-ziggy
   disk_quota: 1024M
-  buildpack: https://github.com/IBM-Bluemix/python-buildpack-scipy.git
-  services:
-  - cloudant_ziggy
-  - insights_ziggy
+  buildpack: https://github.com/cloudfoundry/staticfile-buildpack.git

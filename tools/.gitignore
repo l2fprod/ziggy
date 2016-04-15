@@ -1,0 +1,4 @@
+node_modules
+env.json
+*albums.json
+*songs.json

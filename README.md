@@ -19,6 +19,7 @@ http://blog.danwin.com/examples-of-web-scraping-in-python-3-x-for-data-journalis
 1. Install [application requirements](application-requirements) as needed.
 1. Open application directory in your terminal and run
     `pip install -r ./requirements.txt`
+    * you may need to use "sudo" to run this command or add "--user" flag
 1. This application cannot run without coupled Bluemix services (Watson personality insights and a Cloudant database).  To run a local copy of the application, complete the following steps.
     1.  Create and bind the required services (personality insights, and Cloudant) to your app. 
     1.  Install go-lang, if needed.
@@ -26,6 +27,9 @@ http://blog.danwin.com/examples-of-web-scraping-in-python-3-x-for-data-journalis
         1.  `go get github.com/jthomas/copyenv `
         1.  ` cf install-plugin $GOPATH/bin/copyenv`
     1.  Now run ```eval `$(cf copyenv <app name>)` ```
+    
+    `export VCAP_SERVICES=`cat env.json``
+    
 1. Lastly, the app features a Twitter integration, so Twitter OAuth credentials are needed as well.  If you don't have them, [start here](https://dev.twitter.com/oauth/overview/application-owner-access-tokens).
     1.  Run the following  `export TWITTER_CREDS='{"access_key": "<ACCESS KEY>", "access_secret": "<ACCESS SECRET>", "consumer_key": "<CONSUMER KEY>", "consumer_secret": "<CONSUMER SECRET>"}'`
 1. Run `python ./server.py` to start your server.
@@ -36,7 +40,7 @@ http://blog.danwin.com/examples-of-web-scraping-in-python-3-x-for-data-journalis
 1. Create services in your Bluemix org and space that will align with the services expected in `manifest.yml`.
     * `cf create-service cloudantNoSQLDB Shared cloudant_ziggy`
     * `cf create-service personality_insights tiered insights_ziggy`
-    * `cf create-service tone_analyzer tiered tone_ziggy`
+    * `cf create-service tone_analyzer beta tone_ziggy`
     * Once the application is running be sure to initially request `/setup` from a browser to cache all personas.
     
 ##### Lyrics
