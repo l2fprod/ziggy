@@ -1,0 +1,22 @@
+{
+  "name": "NAME",
+  "personas": [
+    {
+      "name": "NAME",
+      "_id": "NAME",
+      "location": "",
+      "image": "",
+      "style": "",
+      "background": "#dd4131",
+      "date": "1973-76",
+      "start": "1973",
+      "end": "1976",
+      "key": "NAME",
+      "sketch": "svg/early.svg",
+      "mugshot": "mug/early.svg",
+      "photo": "photo/early.png",
+      "video": "https://youtube.com/embed/XXXX",
+      "description": "PHASE 2 description."
+    }
+  ]
+}
