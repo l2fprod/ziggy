@@ -121,6 +121,24 @@ async.waterfall([
         docs: ziggyAlbums
       }, null, 2));
     });
+
+    var songsById = {};
+    ziggySongs.forEach(function (song) {
+      songsById[song._id] = song;
+    });
+
+    var allLyrics = fs.createWriteStream(artist.name + "-lyrics.txt");
+    allLyrics.once('open', function (fd) {
+      albums.forEach(function (album) {
+        allLyrics.write("================ " + album._id + "\n\n");
+        album.songs.forEach(function (song) {
+          allLyrics.write("=== " + album._id + " / " + song + "\n\n");
+          allLyrics.write(songsById[song].lyrics);
+          allLyrics.write("\n\n");
+        });
+      });
+    });
+
     console.log("Done!");
   }
 });

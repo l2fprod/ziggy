@@ -144,7 +144,6 @@ function about(e) {
 }
 
 function shareInsight(e) {
-  //      var path = './static/personality.html?persona=' + e.currentTarget.id;
   var path = './personality.html?persona=' + bowies[currentBowie].name;
 
   window.open(path, '_self', false);

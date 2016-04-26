@@ -23,7 +23,6 @@ songs.docs.forEach(function (song) {
 });
 
 var personas = [];
-
 var combined = [];
 var computePersonalityTasks = [];
 
@@ -80,9 +79,14 @@ async.waterfall(computePersonalityTasks, function (err, result) {
   if (err) {
     console.log(err);
   } else {
-    var combinedOutput = fs.createWriteStream("../static/generated/combined.js");
+    var combinedOutput = fs.createWriteStream("../static/generated/combined.json");
     combinedOutput.once('open', function (fd) {
-      combinedOutput.write("var generated_combined = " + JSON.stringify(combined, null, 2) + ";");
+      combinedOutput.write(JSON.stringify(combined, null, 2));
+    });
+
+    var combinedJsonOutput = fs.createWriteStream("../static/generated/combined.js");
+    combinedJsonOutput.once('open', function (fd) {
+      combinedJsonOutput.write("var generated_combined = " + JSON.stringify(combined, null, 2) + ";");
     });
   }
 });

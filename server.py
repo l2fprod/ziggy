@@ -16,9 +16,7 @@ import os
 import json
 import requests
 from flask import Flask, jsonify
-from cloudant.account import Cloudant
 from watson_developer_cloud import PersonalityInsightsV2 as PersonalityInsights
-from watson_developer_cloud import ToneAnalyzerV3Beta 
 from twitter import *
 from scipy.spatial import distance
 
@@ -26,63 +24,27 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-if 'TWITTER_CREDS' not in os.environ:
-    raise RuntimeError('TWITTER_CREDS not found.')
-else:
-    TWITTER = json.loads(os.environ['TWITTER_CREDS'])
-
-twitter = Twitter(auth = OAuth(TWITTER["access_key"], TWITTER["access_secret"], TWITTER["consumer_key"], TWITTER["consumer_secret"]))
-
 if 'VCAP_SERVICES' not in os.environ:
     raise RuntimeError("VCAP_SERVICES not found.")
-elif 'cloudantNoSQLDB' not in json.loads(os.environ['VCAP_SERVICES']):
-    raise RuntimeError("Cloudant database not bound to service.")
+VCAP_SERVICES = json.loads(os.environ['VCAP_SERVICES'])
 
-WATSON = json.loads(os.environ['VCAP_SERVICES'])['personality_insights'][0]
+TWITTER = VCAP_SERVICES['user-provided'][0]["credentials"]
+twitter = Twitter(auth = OAuth(TWITTER["access_key"], TWITTER["access_secret"], TWITTER["consumer_key"], TWITTER["consumer_secret"]))
+
+WATSON = VCAP_SERVICES['personality_insights'][0]
 if 'credentials' not in WATSON:
     raise RuntimeError("Cannot connect to Watson.  Credentials not found for personality insights.")
 else:
     personality_insights = PersonalityInsights(username=WATSON['credentials']['username'], password=WATSON['credentials']['password'])
-    
-TONE = json.loads(os.environ['VCAP_SERVICES'])['tone_analyzer'][0]
-if 'credentials' not in TONE:
-    raise RuntimeError("Cannot connect to Watson.  Credentials not found for personality insights.")
-else:
-    tone_analyzer = ToneAnalyzerV3Beta(username=TONE['credentials']['username'], password=TONE['credentials']['password'], version='2016-02-11')
-    
-
-CLOUDANT = json.loads(os.environ['VCAP_SERVICES'])['cloudantNoSQLDB'][0]
-if 'credentials' not in CLOUDANT:
-    raise RuntimeError("Cannot connect to database, Cloudant credentials not found.")
-else:
-    client = Cloudant(CLOUDANT['credentials']['username'], CLOUDANT['credentials']['password'], url=CLOUDANT['credentials']['url'])
-    client.connect()
-
-databases = ['personas', 'albums', 'songs']
-for db in databases:
-    if db not in client.all_dbs():
-        raise RuntimeError("Database " + db + " not found, please ensure you have the needed data.")
-
-cached_tone = {}
-for persona in client['personas']:
-    cached_tone[persona['_id']] = None
 
 cached_persona_insights = {}
-for persona in client['personas']:
-    cached_persona_insights[persona['_id']] = None
-
-def assemble_persona_text(persona):
-    text = ''
-    for album in client['personas'][persona]['albums']:
-        for song in client['albums'][album['title']]['songs']:            
-            try:
-                if 'lyrics' in client['songs'][song]:
-                    text += client['songs'][song]['lyrics']
-            except KeyError as e:
-                print e  #just swallow it silently for now ToDo: something better...
-    return text
+with open('./static/generated/combined.json') as json_file:
+    json_data = json.load(json_file)        
+    for p in json_data:
+        cached_persona_insights[p['data']['id']] = p['data']                                              
 
 def pull_tweets_by_screenname(screenname):
+    print "Calling twitter"
     tweets = response = twitter.statuses.user_timeline(screen_name = screenname, count = 200)
     while len(response) > 0:
         print 'fetching more tweets for ' + screenname
@@ -126,91 +88,13 @@ def calculate_personality_distance(twitter_profile):
     return output
 
 ## Begin Flask server
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="")
 if 'FLASK_DEBUG' in os.environ:
     app.debug = True
-
+      
 @app.route('/')
 def Welcome():
-    return app.send_static_file('index.html')
-
-@app.route('/init')
-def Initialize():
-    print 'this is a test' ;
-    
-    with open('static/personas.json') as json_file:
-        json_data = json.load(json_file)
-        # print json_data 
-        
-        for p in json_data['results']:
-            client['personas'].create_document(p)
-
-        print 'loaded file' ;
-    return
-
-@app.route('/setup')
-def Setup():
-    personas = GetPersonas()
-    for persona in json.loads(personas.data)['results']:
-        print 'Getting persona ' + persona['name']
-        GetPersona(persona['name'])
-    return 'Setup complete!'
-
-@app.route('/api/personas')
-def GetPersonas():
-    response = []
-    
-    for persona in client['personas']:
-        
-        albums = []
-        
-        for album in persona['albums']:
-            albums.append(album['title']);
-        
-        response.append({'name': persona['_id'], 'albums': albums})
-
-    return jsonify(results=response)
-
-@app.route('/api/persona/<persona>')
-def GetPersona(persona):
-        
-    if cached_persona_insights[persona] is None:
-        
-        personality = assemble_persona_text(persona)
-        
-        insight = personality_insights.profile(json.dumps({'text':personality, 'contenttype': 'text/html'}))
-        cached_persona_insights[persona] = insight
-    else:
-        insight = cached_persona_insights[persona]
-
-    return jsonify(results=insight)
-
-@app.route('/api/tone/<persona>')
-def GetTone(persona):
-        
-    if cached_tone[persona] is None:
-        
-        personality = assemble_persona_text(persona)
-        
-        insight = tone_analyzer.tone(json.dumps({'text':personality, 'contenttype': 'text/html'}))
-        cached_tone[persona] = insight
-    else:
-        insight = cached_tone[persona]
-
-    return jsonify(results=insight)
-
-
-@app.route('/api/collected')
-def Collected():
-    for persona in client['personas']:
-        
-        print persona
-        
-        if cached_persona_insights[persona] is not None:
-            insight = cached_persona_insights[persona]
-            print insight
-            
-    return
+  return app.send_static_file('index.html')
 
 @app.route('/api/twitter/<screenname>')
 def InsightsFromTwitter(screenname):

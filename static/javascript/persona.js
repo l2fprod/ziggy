@@ -3,28 +3,7 @@ var sortingHat;
 var keys = ['Agreeableness', 'Conscientiousness', 'Openness', 'Extraversion', 'Emotional range'];
 
 function SortingHat() {
-    this.personas;
-}
-
-SortingHat.prototype.fetchPersonas = function () {
-    var url = './personas.json';
-
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.self = this;
-
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            var data = JSON.parse(xmlhttp.responseText);
-
-            xmlhttp.self.personas = data.results;
-
-            console.log('fetched personas');
-        }
-    };
-
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
+    this.personas = generated_personas;
 }
 
 SortingHat.prototype.compare = function compare(a, b) {
@@ -197,5 +176,4 @@ function renderBowie() {
 
 window.onload = function () {
     sortingHat = new SortingHat();
-    sortingHat.fetchPersonas();
 }
