@@ -95,14 +95,14 @@ function readPersonaData(pdata) {
     if (mug.name === persona) {
       thisPersona = mug;
       var pic = document.createElement('img');
-      pic.src = 'images/' + mug.mugshot;
+      pic.src = mug.mugshot;
       pic.className = "pic"
 
       var avatar = document.getElementById('avatar');
       avatar.appendChild(pic);
 
       var banner = document.getElementById('banner');
-      banner.style.backgroundImage = 'url(images/' + mug.photo + ')';
+      banner.style.backgroundImage = 'url(' + mug.photo + ')';
       banner.style.backgroundSize = 'cover';
 
       changeColor(mug.background);
@@ -147,7 +147,7 @@ function readPersonaData(pdata) {
       avatar.className = "followAvatar";
 
       var avatarImage = document.createElement('img');
-      avatarImage.src = 'images/' + mug.mugshot;
+      avatarImage.src = mug.mugshot;
       avatarImage.className = "avatarImage";
 
       avatar.appendChild(avatarImage);
@@ -324,10 +324,10 @@ function readPersonaData(pdata) {
 
       total = total + contribution;
 
-      var label = trait.name + ' ' + trait.percentage.toFixed(2) * 100 + '%';
-      var factorlabel = factor.id + ' ' + percentage.toFixed(2) * 100 + '%';
+      var label = trait.name + ' ' + Math.ceil(trait.percentage.toFixed(2) * 100) + '%';
+      var factorlabel = factor.id + ' ' + Math.ceil(percentage.toFixed(2) * 100) + '%';
       var traitdata = [factorlabel, label, contribution];
-
+      
       if (contribution > 0) {
         factordata.push(traitdata);
       }

@@ -113,7 +113,7 @@ SortingHat.prototype.renderBowie = function (e) {
                     var w = stage.parentElement.clientWidth - 380;
 
                     var bowie = document.createElement('img');
-                    bowie.src = './images/' + persona.sketch;
+                    bowie.src = persona.sketch;
                     bowie.style.height = h - 40 + 'px';
                     stage.appendChild(bowie);
 

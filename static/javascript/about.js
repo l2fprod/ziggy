@@ -9,7 +9,7 @@ function littleWonders(data) {
   data.forEach(function (persona) {
 
     var sketch = document.createElement('img');
-    sketch.src = 'images/' + persona.sketch;
+    sketch.src = persona.sketch;
     sketch.className = "imageBowie";
     sketch.style.height = '240px';
     sketch.title = persona.name;
