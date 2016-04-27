@@ -26,6 +26,33 @@ the biography and identify important phases.
 
 ### Grab albums, songs and lyrics
 
+1. In *tools*, create a file named **env.json** containing your Discogs and Personality Insights credentials as follow:
+
+  ```
+  {
+    "discog": [
+      {
+        "credentials": {
+          "key": "your key here",
+          "secret": "your secret here"
+        }
+      }
+    ],
+    "personality_insights": [
+      {
+        "credentials": {
+          "password": "your password here",
+          "url": "https://gateway.watsonplatform.net/personality-insights/api",
+          "username": "your username here"
+        },
+        "label": "personality_insights",
+        "name": "ziggy-insights",
+        "plan": "tiered",
+      }
+    ]
+  }
+  ```
+
 1. In *tools*, run
 
   ```
@@ -43,7 +70,7 @@ the biography and identify important phases.
   node generate.js myartist.json name-albums.json name-songs.json
   ```
   
-  It generates files under *../static/generated*
+  It generates files under *../static/generated*. You can rerun this command if you make changes to *myartist.json*
 
 ## Deploying the application
 
