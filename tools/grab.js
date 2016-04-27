@@ -129,7 +129,7 @@ async.waterfall([
 
     var allLyrics = fs.createWriteStream(artist.name + "-lyrics.txt");
     allLyrics.once('open', function (fd) {
-      albums.forEach(function (album) {
+      ziggyAlbums.forEach(function (album) {
         allLyrics.write("================ " + album._id + "\n\n");
         album.songs.forEach(function (song) {
           allLyrics.write("=== " + album._id + " / " + song + "\n\n");
