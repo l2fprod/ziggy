@@ -11,6 +11,7 @@ var artist = JSON.parse(fs.readFileSync(inputFilename));
 
 var ziggyAlbums = [];
 var ziggySongs = [];
+var songsById = {};
 
 var discog = require("./discog.js")(env.discog[0].credentials.key,
   env.discog[0].credentials.secret);
@@ -67,11 +68,17 @@ async.waterfall([
             });
 
             tracks.forEach(function (track) {
-              ziggySongs.push({
-                _id: track.title,
-                name: track.title,
-                lyrics: ""
-              })
+              if (!songsById.hasOwnProperty(track.title)) {
+                var song = {
+                  _id: track.title,
+                  name: track.title,
+                  lyrics: ""
+                };
+                ziggySongs.push(song);
+                songsById[song._id] = song;
+              } else {
+                console.log("Song already exists", track.title);
+              }
             });
           }
           callback(null);
@@ -85,6 +92,7 @@ async.waterfall([
   // get all lyrics
   function (callback) {
     var tasks = [];
+    console.log("Finding lyrics for", ziggySongs.length, "songs");
     ziggySongs.forEach(function (song) {
       tasks.push(function (callback) {
         console.log("Getting lyrics for", song.name);
@@ -120,11 +128,6 @@ async.waterfall([
       albumsOutput.write(JSON.stringify({
         docs: ziggyAlbums
       }, null, 2));
-    });
-
-    var songsById = {};
-    ziggySongs.forEach(function (song) {
-      songsById[song._id] = song;
     });
 
     var allLyrics = fs.createWriteStream(artist.name + "-lyrics.txt");
